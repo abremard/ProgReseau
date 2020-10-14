@@ -1,2 +1,3 @@
 UDP/**/*.class
 TCP/**/*.class
+HTTP/**/*.class

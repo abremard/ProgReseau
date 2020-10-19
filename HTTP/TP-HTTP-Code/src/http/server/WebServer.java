@@ -12,7 +12,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.imageio.IIOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -265,6 +264,28 @@ public class WebServer {
 
           
           case "DELETE":
+          String deletePathString = System.getProperty("user.dir");
+          deletePathString = pathString.concat(reqHead.getRequestUrl());
+          Path deletePath = Paths.get(deletePathString);
+          try{
+            boolean result = deleteIfExists(deletePath);
+            if(result){
+              bodyObjectText = "<h1> The file has been successfully deleted </h1>";
+              byte[] bodyObject = bodyObjectText.getBytes();
+              requestHandler(out, 200, "OK", "text/html", bodyObject);
+            }
+            else{
+              bodyObjectText = "<h1> The requested file was not found </h1>";
+              byte[] bodyObject = bodyObjectText.getBytes();
+              requestHandler(out, 404, "NOT FOUND", "text/html", bodyObject);
+            }
+          }
+          catch (Exception e) {
+            bodyObjectText = "<h1> An unexpected error has occured </h1>";
+            byte[] bodyObject = bodyObjectText.getBytes();
+            requestHandler(out, 500, "INTERNAL SERVER ERROR", "text/html", bodyObject);
+            e.printStackTrace();
+          }
 
             break;
 

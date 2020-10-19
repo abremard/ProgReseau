@@ -288,7 +288,7 @@ public class WebServer {
     }
   }
 
-  private void requestHandler(PrintWriter out, int status, String statusMessage, String contentType) {
+  private void requestHandler(PrintWriter out, int status, String statusMessage, String contentType, byte[] bodyObject) {
     out.println("HTTP/1.0 "+Integer.toString(status)+" "+statusMessage);
     out.println("Content-Type: "+contentType);
     out.println("Server: Bot");
@@ -296,6 +296,7 @@ public class WebServer {
       case 200:
         out.println("");
         out.println("<h2>Welcome to the Ultra Mini-WebServer</h2>");
+        out.println(bodyObject);
         break;
       case 400:
         System.out.println("Error 400 : Bad request!");

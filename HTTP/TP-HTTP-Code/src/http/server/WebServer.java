@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import javax.imageio.ImageIO;
 
+import http.server.LuckFinder;
 import http.server.RequestHeader;
 
 /**

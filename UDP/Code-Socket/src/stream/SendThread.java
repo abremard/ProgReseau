@@ -10,7 +10,7 @@ public class SendThread extends Thread {
     InetAddress groupAddr = null;
     int groupPort;
     boolean running;
-    
+    String username;
     private BufferedReader socIn;
 	SendThread(MulticastSocket s, InetAddress grAddr, int grPort) {
         this.socket = s;
@@ -27,11 +27,19 @@ public class SendThread extends Thread {
     	  try { 
                 stdIn = new BufferedReader(new InputStreamReader(System.in));
                 while (running) {
-                    String msg = stdIn.readLine();
-                    if (msg.equals(".") && msg != null) {
-                        socket.leaveGroup(groupAddr); 
+                    if(username==null){
+                        System.out.println("Enter your username : ");
+                        this.username = stdIn.readLine();
+                    }
+                    String msgTyped =stdIn.readLine();
+                    String msgSent = username + " : " + msgTyped;
+                    if (msgTyped.equals(".") && msgTyped != null) {
+                        this.running = false;
+                        socket.leaveGroup(groupAddr);
+                        System.exit(0);
+
                     } else {
-                        DatagramPacket packet = new DatagramPacket(msg.getBytes(),msg.length(), groupAddr, groupPort);
+                        DatagramPacket packet = new DatagramPacket(msgSent.getBytes(),msgSent.length(), groupAddr, groupPort);
                         socket.send(packet);   
                     }             
                 }

@@ -28,7 +28,7 @@ public class ReceiveThread extends Thread {
                     // Receive a datagram packet response
                     socket.receive(recv);
                     String received = new String(recv.getData(), 0, recv.getLength());
-                    System.out.println("Response: "+received);
+                    System.out.println(received);
                 }
             }
         catch (Exception e) {

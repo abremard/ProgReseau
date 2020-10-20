@@ -44,10 +44,13 @@ public class MulticastClient  {
             // s.leaveGroup(groupAddr);
             
             while (true) {
-                if (!st.running) {
+                if (st.running == false) {
                     rt.running = false;
+                    System.out.println("sdiu");
+                    break;
                 }
             }
+            System.exit(0);
         } catch (Exception e) {
             System.err.println("Error in MulticastClient:" + e);
             e.printStackTrace();

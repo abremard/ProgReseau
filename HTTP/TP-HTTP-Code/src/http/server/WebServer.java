@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-// import http.server.LuckFinder;
+import http.server.LuckFinderTest;
 import http.server.RequestHeader;
 
 /**
@@ -93,26 +93,36 @@ public class WebServer {
            * If file is not found, returns a 404 not found error. Any other errors encountered are considered server-side
            */
             case "GET":
-              try {
-                File file = new File(reqHead.getRequestUrl().substring(1));
-                BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(file));
-                int readSize;
-                byte[] buff = new byte[1024];
+              if (reqHead.getFileExtension().startsWith("py")) {
+                String param = reqHead.getFileExtension().split("=")[1];
+                String scriptName = reqHead.getRequestUrl().split("\\?")[0];
+                LuckFinderTest myLuckFinder = new LuckFinderTest();
+                String result = myLuckFinder.launch(param, scriptName);
                 headerString = responseBuilder(200, "OK", reqHead);
                 out.write(headerString.getBytes());
-                while ((readSize = fileStream.read(buff)) > 0)
-                {
-                  out.write(buff, 0, readSize);
+                out.write(result.getBytes());
+              } else {
+                  try {
+                    File file = new File(reqHead.getRequestUrl().substring(1));
+                    BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(file));
+                    int readSize;
+                    byte[] buff = new byte[1024];
+                    headerString = responseBuilder(200, "OK", reqHead);
+                    out.write(headerString.getBytes());
+                    while ((readSize = fileStream.read(buff)) > 0)
+                    {
+                      out.write(buff, 0, readSize);
+                    }
+                    fileStream.close();
+                  } catch (FileNotFoundException e) {
+                    headerString = responseBuilder(404, "NOT FOUND", reqHead);
+                    out.write(headerString.getBytes());                                    
+                  } catch (Exception e) {
+                    headerString = responseBuilder(500, "INTERNAL SERVER ERROR", reqHead);
+                    out.write(headerString.getBytes());   
+                    e.printStackTrace();
+                  }
                 }
-                fileStream.close();
-              } catch (FileNotFoundException e) {
-                headerString = responseBuilder(404, "NOT FOUND", reqHead);
-                out.write(headerString.getBytes());                                    
-              } catch (Exception e) {
-                headerString = responseBuilder(500, "INTERNAL SERVER ERROR", reqHead);
-                out.write(headerString.getBytes());   
-                e.printStackTrace();
-              }
               out.flush();
               break;
             /**
@@ -298,6 +308,7 @@ public class WebServer {
             responseHeader = responseHeader.concat("Content-Type: application/vnd.oasis.opendocument.text\r\n");
             break;
           default:
+            responseHeader = responseHeader.concat("Content-Type: text/html\r\n");
             break;
         }
         break;

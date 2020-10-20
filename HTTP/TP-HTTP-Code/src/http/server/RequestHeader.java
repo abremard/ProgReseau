@@ -7,7 +7,6 @@ public class RequestHeader {
     private String httpVersion;
     private String host;
     private String fileExtension;
-    private boolean fileAccess;
     // private String connection;
     // private String cacheControl;
     // private String upgradeInsecureRequests;
@@ -18,7 +17,6 @@ public class RequestHeader {
 
     RequestHeader() {
         this.firstLine = true;
-        this.fileAccess = false;
     }
 
     public void parseRequest(String line) {
@@ -28,7 +26,6 @@ public class RequestHeader {
             this.requestUrl = stringArray[1];
             try {
                 this.fileExtension = stringArray[1].split("[.]")[1];
-                this.fileAccess = true;
             } catch (Exception e) {
                 // no file extension
             }
@@ -53,7 +50,6 @@ public class RequestHeader {
     public void printObject() {
         System.out.println("requestType : "+requestType);
         System.out.println("requestUrl : "+requestUrl);
-        System.out.println("fileAccess : "+Boolean.toString(fileAccess));
         System.out.println("fileExtension : "+fileExtension);
         System.out.println("httpVersion : "+httpVersion);
         System.out.println("host : "+host);
@@ -65,10 +61,6 @@ public class RequestHeader {
 
     public String getRequestUrl() {
         return requestUrl;
-    }
-    
-    public boolean getFileAccess() {
-        return fileAccess;
     }
 
     public String getFileExtension() {

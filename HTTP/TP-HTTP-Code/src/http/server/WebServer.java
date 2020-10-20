@@ -26,7 +26,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import javax.imageio.ImageIO;
 
-import http.server.LuckFinder;
+import java.nio.charset.StandardCharsets;
+
+// import http.server.LuckFinder;
 import http.server.RequestHeader;
 
 /**
@@ -51,7 +53,6 @@ public class WebServer {
     System.out.println("Webserver starting up on port 80");
     System.out.println("(press ctrl-c to exit)");
     try {
-      // create the main server socket
       s = new ServerSocket(80);
     } catch (Exception e) {
       System.out.println("Error: " + e);
@@ -60,21 +61,15 @@ public class WebServer {
 
     System.out.println("Waiting for connection");
     for (;;) {
+      BufferedOutputStream out = null;
+      Socket remote = null;
+      RequestHeader reqHead = new RequestHeader();
       try {
-        // wait for a connection
-        Socket remote = s.accept();
-        // remote is now the connected socket
+        remote = s.accept();
         System.out.println("Connection, sending data.");
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-            remote.getInputStream()));
-        PrintWriter out = new PrintWriter(remote.getOutputStream());
-        
-        // read the data sent. We basically ignore it,
-        // stop reading once a blank line is hit. This
-        // blank line signals the end of the client HTTP
-        // headers.
+        BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
+        BufferedInputStream inputStream = new BufferedInputStream(remote.getInputStream());
         String str = ".";
-        RequestHeader reqHead = new RequestHeader();
         str = in.readLine();
         while (str != null && !str.equals(""))
         {
@@ -82,171 +77,47 @@ public class WebServer {
           reqHead.parseRequest(str);
           str = in.readLine();
         }
+
         if (debugMode) {
           reqHead.printObject();  
         }
         String requestType = reqHead.getRequestType();
         switch (requestType) {
           case "GET":
-
-            String pathString = System.getProperty("user.dir");
-            pathString = pathString.concat(reqHead.getRequestUrl());
-            Path path = Paths.get(pathString);
-
-            if (reqHead.getFileAccess()) {
-              switch (reqHead.getFileExtension()) {
-                case "jpg":
-                  try {
-                    requestHandler(out, 200, "OK", "image/jpeg");                                                       
-                    BufferedImage originalImage = ImageIO.read(new File(pathString));
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write( originalImage, "jpg", baos );
-                    baos.flush();
-                    byte[] imageInByte = baos.toByteArray();
-                    baos.close();
-                    remote.getOutputStream().write(imageInByte);                    
-                  } catch (IIOException e) {
-                    requestHandler(out, 404, "NOT FOUND", "image/jpeg");                                                       
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                  break;
-                case "png":
-                  try {
-                    BufferedImage originalPngImage = ImageIO.read(new File(pathString));
-                    requestHandler(out, 200, "OK", "image/png");                                    
-                    ByteArrayOutputStream pngBaos = new ByteArrayOutputStream();
-                    ImageIO.write( originalPngImage, "png", pngBaos );
-                    pngBaos.flush();
-                    byte[] pngImageInByte = pngBaos.toByteArray();
-                    pngBaos.close();
-                    remote.getOutputStream().write(pngImageInByte);                    
-                  } catch (IIOException e) {
-                    requestHandler(out, 404, "NOT FOUND", "image/png");                                    
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                  break;
-                case "ico":
-                  out.println("HTTP/1.0 200 OK");
-                  out.println("Content-Type: image/x-icon");
-                  out.println("Server: Bot");
-                break;
-                case "wav":
-                  try {
-                    ByteArrayOutputStream wavBaos = new ByteArrayOutputStream();
-                    BufferedInputStream wavBis = new BufferedInputStream(new FileInputStream(new File(pathString)));
-                    int read;
-                    byte[] buff = new byte[1024];
-                    while ((read = wavBis.read(buff)) > 0)
-                    {
-                      wavBaos.write(buff, 0, read);
-                    }
-                    wavBaos.flush();
-                    byte[] audioBytes = wavBaos.toByteArray();
-                    wavBaos.close();
-                    remote.getOutputStream().write(audioBytes);
-                    requestHandler(out, 200, "OK", "audio/wav");                                    
-                  } catch (IIOException e) {
-                    requestHandler(out, 404, "NOT FOUND", "audio/wav");                                    
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                  break;
-                case "mp3":
-                  try {
-                    ByteArrayOutputStream mp3Baos = new ByteArrayOutputStream();
-                    BufferedInputStream mp3Bis = new BufferedInputStream(new FileInputStream(new File(pathString)));
-                    int read;
-                    byte[] buff = new byte[1024];
-                    while ((read = mp3Bis.read(buff)) > 0)
-                    {
-                      mp3Baos.write(buff, 0, read);
-                    }
-                    mp3Baos.flush();
-                    byte[] audioBytes = mp3Baos.toByteArray();
-                    mp3Baos.close();
-                    remote.getOutputStream().write(audioBytes);
-                    requestHandler(out, 200, "OK", "audio/mpeg");                                    
-                  } catch (IIOException e) {
-                    requestHandler(out, 404, "NOT FOUND", "audio/mpeg");                                    
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                  break;
-                case "mp4":
-                  try {
-                    ByteArrayOutputStream mp4Baos = new ByteArrayOutputStream();
-                    BufferedInputStream mp4Bis = new BufferedInputStream(new FileInputStream(new File(pathString)));
-                    int read;
-                    byte[] buff = new byte[1024];
-                    while ((read = mp4Bis.read(buff)) > 0)
-                    {
-                      mp4Baos.write(buff, 0, read);
-                    }
-                    mp4Baos.flush();
-                    byte[] audioBytes = mp4Baos.toByteArray();
-                    mp4Baos.close();
-                    remote.getOutputStream().write(audioBytes);
-                    requestHandler(out, 200, "OK", "video/mpeg");                                    
-                  } catch (IIOException e) {
-                    requestHandler(out, 404, "NOT FOUND", "video/mpeg");                                    
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                  break;
-                case "pdf":
-                  try {
-                    ByteArrayOutputStream pdfBaos = new ByteArrayOutputStream();
-                    BufferedInputStream pdfBis = new BufferedInputStream(new FileInputStream(new File(pathString)));
-                    int read;
-                    byte[] buff = new byte[1024];
-                    while ((read = pdfBis.read(buff)) > 0)
-                    {
-                      pdfBaos.write(buff, 0, read);
-                    }
-                    pdfBaos.flush();
-                    byte[] audioBytes = pdfBaos.toByteArray();
-                    pdfBaos.close();
-                    remote.getOutputStream().write(audioBytes);
-                    requestHandler(out, 200, "OK", "application/pdf");                                    
-                  } catch (IIOException e) {
-                    requestHandler(out, 404, "NOT FOUND", "application/pdf");                                    
-                  } catch (Exception e) {
-                    e.printStackTrace();
-                  }
-                  break;
-                case "html":
-                  try (Stream<String> lines = Files.lines(path)) {
-                    requestHandler(out, 200, "OK", "text/html");                  
-                    String content = lines.collect(Collectors.joining(System.lineSeparator()));
-                    out.println(content);
-                    out.println();
-                  } catch (NoSuchFileException e) {
-                    requestHandler(out, 404, "NOT FOUND", "text/html");
-                  } catch (IOException e) {
-                      e.printStackTrace();
-                  }                  
-                  break;
-              
-                default:
-                  break;
+            try {
+              String pathString = System.getProperty("user.dir");
+              pathString = pathString.concat(reqHead.getRequestUrl());
+              File ressource = new File(pathString);
+              BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(ressource));
+              int readSize;
+              byte[] buff = new byte[1024];
+              out = new BufferedOutputStream(remote.getOutputStream());
+              String headerString = requestBuilder(200, "OK", reqHead, ressource.length());
+              out.write(headerString.getBytes());
+              while ((readSize = fileStream.read(buff)) > 0)
+              {
+                out.write(buff, 0, readSize);
               }
-
-            } else {
-              requestHandler(out, 400, "BAD SYNTAX", "text/html");
+              fileStream.close();
+              out.flush();
+            } catch (NoSuchFileException e) {
+              String headerString = requestBuilder(404, "RESSOURCE NOT FOUND", reqHead, 0);
+              out.write(headerString.getBytes());                                    
+            } catch (Exception e) {
+              String headerString = requestBuilder(500, "INTERNAL SERVER ERROR", reqHead, 0);
+              out.write(headerString.getBytes());   
+              e.printStackTrace();
             }
             break;
         
           case "POST":
-            File file = new File("files/test.txt");
+            File file = new File("files/test.mp3");
             file.createNewFile();
             byte[] buffer = new byte[256];
-            InputStream inputStream = remote.getInputStream();
             BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(file));
             while (inputStream.available() > 0) {
               int read = inputStream.read(buffer);
-              fileOutput.write(buffer, 0, read);;
+              fileOutput.write(buffer, 0, read);
             }
             fileOutput.flush();
             fileOutput.close();
@@ -263,80 +134,92 @@ public class WebServer {
             break;
 
           
-          case "DELETE":
-          String deletePathString = System.getProperty("user.dir");
-          deletePathString = pathString.concat(reqHead.getRequestUrl());
-          Path deletePath = Paths.get(deletePathString);
-          try{
-            boolean result = deleteIfExists(deletePath);
-            if(result){
-              bodyObjectText = "<h1> The file has been successfully deleted </h1>";
-              byte[] bodyObject = bodyObjectText.getBytes();
-              requestHandler(out, 200, "OK", "text/html", bodyObject);
-            }
-            else{
-              bodyObjectText = "<h1> The requested file was not found </h1>";
-              byte[] bodyObject = bodyObjectText.getBytes();
-              requestHandler(out, 404, "NOT FOUND", "text/html", bodyObject);
-            }
-          }
-          catch (Exception e) {
-            bodyObjectText = "<h1> An unexpected error has occured </h1>";
-            byte[] bodyObject = bodyObjectText.getBytes();
-            requestHandler(out, 500, "INTERNAL SERVER ERROR", "text/html", bodyObject);
-            e.printStackTrace();
-          }
+          // case "DELETE":
+          // String deletePathString = System.getProperty("user.dir");
+          // deletePathString = pathString.concat(reqHead.getRequestUrl());
+          // Path deletePath = Paths.get(deletePathString);
+          // try{
+          //   boolean result = deleteIfExists(deletePath);
+          //   if(result){
+          //     bodyObjectText = "<h1> The file has been successfully deleted </h1>";
+          //     byte[] bodyObject = bodyObjectText.getBytes();
+          //     requestHandler(out, 200, "OK", "text/html", bodyObject);
+          //   }
+          //   else{
+          //     bodyObjectText = "<h1> The requested file was not found </h1>";
+          //     byte[] bodyObject = bodyObjectText.getBytes();
+          //     requestHandler(out, 404, "NOT FOUND", "text/html", bodyObject);
+          //   }
+          // }
+          // catch (Exception e) {
+          //   bodyObjectText = "<h1> An unexpected error has occured </h1>";
+          //   byte[] bodyObject = bodyObjectText.getBytes();
+          //   requestHandler(out, 500, "INTERNAL SERVER ERROR", "text/html", bodyObject);
+          //   e.printStackTrace();
+          // }
 
-            break;
+          //   break;
 
           default:
             break;
         }
-        out.flush();
         remote.close();
-      } catch (Exception e) {
-        try {
-          Socket remote = s.accept();
-          BufferedReader in = new BufferedReader(new InputStreamReader(
-              remote.getInputStream()));
-          PrintWriter out = new PrintWriter(remote.getOutputStream());
-          requestHandler(out, 500, "INTERNAL SERVER ERROR", " ");
-          e.printStackTrace();          
-        } catch (Exception ex) {
-          ex.printStackTrace();
-        }
+      } catch (Exception e) {  
+        e.printStackTrace();
       }
     }
   }
 
-  private void requestHandler(PrintWriter out, int status, String statusMessage, String contentType, byte[] bodyObject) {
-    out.println("HTTP/1.0 "+Integer.toString(status)+" "+statusMessage);
-    out.println("Content-Type: "+contentType);
-    out.println("Server: Bot");
-    switch (status) {
-      case 200:
-        out.println("");
-        out.println("<h2>Welcome to the Ultra Mini-WebServer</h2>");
-        out.println(bodyObject);
+  private String requestBuilder(int statusCode, String statusMessage, RequestHeader reqHead, long length) {
+    String responseHeader = "";
+    responseHeader = responseHeader.concat("HTTP/1.0 "+Integer.toString(statusCode)+" "+statusMessage+"\r\n");
+    switch (reqHead.getFileExtension()) {
+      case "html":
+        responseHeader = responseHeader.concat("Content-Type: text/html\r\n");
         break;
-      case 400:
-        System.out.println("Error 400 : Bad request!");
-        out.println("");
-        out.println("<h1>Error 400</h1><h2>The request could not be understood by the server due to malformed syntax. Please verify the request syntax before retrying...</h2>");
+      case "png":
+        responseHeader = responseHeader.concat("Content-Type: image/png\r\n");
         break;
-      case 404:
-        System.out.println("Error 404 : Ressource not found!");
-        out.println("");
-        out.println("<h1>Error 404</h1><h2>The requested resource could not be found but may be available again in the future. Please try again later...</h2>");        
+      case "jpg":
+        responseHeader = responseHeader.concat("Content-Type: image/jpg\r\n");
         break;
-      case 500:
-        out.println("");
-        out.println("<h1>Error 500</h1><h2>The server encountered an unexpected condition which prevented it from fulfilling the request. Please try again later...</h2>");
+      case "mp3":
+        responseHeader = responseHeader.concat("Content-Type: audio/mp3\r\n");
         break;
-    
+      case "mp4":
+        responseHeader = responseHeader.concat("Content-Type: video/mp4\r\n");
+        break;
+      case "avi":
+        responseHeader = responseHeader.concat("Content-Type: video/x-msvideo\r\n");
+        break;
+      case "pdf":
+        responseHeader = responseHeader.concat("Content-Type: application/pdf\r\n");
+        break;
+      case "odt":
+        responseHeader = responseHeader.concat("Content-Type: application/vnd.oasis.opendocument.text\r\n");
+        break;
       default:
         break;
     }
+    switch (statusCode) {
+      case 400:
+        System.out.println("Error 400 : Bad request!");
+        responseHeader = responseHeader.concat("<h1>Error 400</h1><h2>The request could not be understood by the server due to malformed syntax. Please verify the request syntax before retrying...</h2>\r\n\r\n");
+        break;
+      case 404:
+        System.out.println("Error 404 : Ressource not found!");
+        responseHeader = responseHeader.concat("<h1>Error 404</h1><h2>The requested resource could not be found but may be available again in the future. Please try again later...</h2>\r\n\r\n");        
+        break;
+      case 500:
+        System.out.println("Error 500 : Internal Server Error!");
+        responseHeader = responseHeader.concat("<h1>Error 500</h1><h2>The server encountered an unexpected condition which prevented it from fulfilling the request. Please try again later...</h2>\r\n\r\n");
+        break;
+      default:
+        responseHeader = responseHeader.concat("Content-Length: "+length+"\r\n");
+        responseHeader = responseHeader.concat("Server: Bot\r\n\r\n");
+        break;
+    }
+    return responseHeader;
   }
 
   /**

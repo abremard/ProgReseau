@@ -31,7 +31,7 @@ public class ClientLocalThread
                 if(socIn != null){
                     String line = socIn.readLine();
                     if(line != null){
-                        System.out.println("echo: " + line );
+                        System.out.println( line );
                     }
                     else{
                         System.err.println("line is null");

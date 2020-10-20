@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class EchoServerMultiThreaded  {
-    public static List<Socket> socketRegistry = new ArrayList<Socket>();
+	public static List<Socket> socketRegistry = new ArrayList<Socket>();
+	public static List<String> chatHistory = new ArrayList<String>();
  	/**
   	* main method
 	* @param EchoServer port
@@ -34,8 +35,10 @@ public class EchoServerMultiThreaded  {
 			Socket clientSocket = listenSocket.accept();
 			System.out.println("Connexion from:" + clientSocket.getInetAddress());
 			ClientThread ct = new ClientThread(clientSocket);
+			//EchoServerListener st = new EchoServerListener(clientSocket, ct.socIn);
 			socketRegistry.add(clientSocket);
 			ct.start();
+			//st.start();
 
 		}
         } catch (Exception e) {

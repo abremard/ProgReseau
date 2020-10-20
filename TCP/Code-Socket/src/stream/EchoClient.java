@@ -24,6 +24,7 @@ public class EchoClient {
         PrintStream socOut = null;
         BufferedReader stdIn = null;
         BufferedReader socIn = null;
+        String pseudo;
 
         if (args.length != 2) {
           System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
@@ -46,16 +47,27 @@ public class EchoClient {
             System.exit(1);
         }
                              
-        String line;
+        String sentLine;
+        String typedLine;;
+        System.out.println("Please enter your username");
+        pseudo=stdIn.readLine();
         ClientLocalThread clientLocalThread = new ClientLocalThread(socIn);
         clientLocalThread.start();
+        //System.out.println("Chat History : ");
+        //for (int i = 0; i < EchoServerMultiThreaded.chatHistory.size(); i++){
+          //System.out.println(EchoServerMultiThreaded.chatHistory.get(i));
+        //}
+        //System.out.println(EchoServerMultiThreaded.chatHistory.size());
         while (true) {
-        	line=stdIn.readLine();
-        	if (line != null && line.equals(".")) {
+          typedLine = stdIn.readLine();
+        	sentLine=pseudo + " : " + typedLine;
+        	if (typedLine != null && typedLine.equals(".")) {
+            //System.out.println(EchoServerMultiThreaded.chatHistory.size());
             clientLocalThread.running = false;
             break;
           }
-            socOut.println(line);
+            socOut.println(sentLine);
+            //EchoServerMultiThreaded.chatHistory.add(sentLine);
         }
       socOut.close();
       socIn.close();

@@ -210,6 +210,7 @@ public class WebServer {
                 if (!file.exists() && file.isFile()) {
                   headerString = responseBuilder(404, "NOT FOUND", reqHead);
                 } else {                
+                  file.delete();
                   headerString = responseBuilder(204, "NO CONTENT", reqHead);
                 }
               }

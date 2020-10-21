@@ -1,12 +1,24 @@
 package http.server;
 import java.lang.ProcessBuilder;
-import java.util.List;
 import java.io.*;
-//import java.io.fabric8.common.util.Processes;
+
+/**
+ * LuckFinderTest executes a Python script in a OS process and retrieves the first line from stdout
+ * 
+ * @author Iyad TOUT, Alexandre BREMARD
+ * @version 1.0
+ */
 public class LuckFinderTest {
     public static void main(String[] args) throws Exception {
     }
     
+  /**
+   * Execute the python file given as a parameter with the user's sign as the other parameter.
+   * 
+   * @param sign the user's horoscope sign
+   * @param nomFichier the python file path
+   * @return prediction message as HTML h1 header
+   */
     public String launch(String sign, String nomFichier){
         try{
             String pathString = System.getProperty("user.name");
@@ -15,7 +27,6 @@ public class LuckFinderTest {
             processBuilder.redirectErrorStream(true);
             Process p = processBuilder.start();
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            //List<String> results = readProcessOutput(p.getInputStream());
             return "<h1> " + in.readLine() + " </h1>";
         }
         catch (Exception e){

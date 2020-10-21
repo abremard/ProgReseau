@@ -1,5 +1,12 @@
 package http.server;
 
+/**
+ * Request header object that contains header attributes
+ * 
+ * @author Iyad TOUT, Alexandre BREMARD
+ * @version 1.0
+ */
+
 public class RequestHeader {
     
     private String requestType;
@@ -19,6 +26,10 @@ public class RequestHeader {
         this.firstLine = true;
     }
 
+    /**
+     * Receives a String line containing key and value, then parses to the object's attributes
+     * @param line
+     */
     public void parseRequest(String line) {
         if (firstLine) {
             String stringArray[] = line.split(" ");
@@ -47,6 +58,9 @@ public class RequestHeader {
         }
     }
 
+    /** 
+     * prints each attribute, used for debugging purposes
+     */
     public void printObject() {
         System.out.println("requestType : "+requestType);
         System.out.println("requestUrl : "+requestUrl);

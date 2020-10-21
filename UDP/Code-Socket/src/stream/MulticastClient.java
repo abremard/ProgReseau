@@ -8,6 +8,11 @@ import stream.ReceiveThread;
 
 public class MulticastClient  {
 
+    /**
+     * The main client. It takes a port number and creates a multicast socket connecting
+     * the client to it. Then creates the send and receive threads.
+     * @exception exception Unexpected error in MulticastClient
+     */
     public static void main(String args[]) {
         try {
             // Group IP address
@@ -21,27 +26,8 @@ public class MulticastClient  {
             SendThread st = new SendThread(s, groupAddr, groupPort);
             st.start();
 
-            // Build a datagram packet for a message
-            // to send to the group
-
-            // String msg = "Hello";
-            // DatagramPacket hi = new
-            // DatagramPacket(msg.getBytes(),msg.length(), groupAddr, groupPort);
-
-            // Send a multicast message to the group
-            // s.send(hi);
-
-            // Build a datagram packet for response
-            // byte[] buf = new byte[1000];
-            // DatagramPacket recv = new DatagramPacket(buf, buf.length);
-            // Receive a datagram packet response
-            // s.receive(recv);
-
             ReceiveThread rt = new ReceiveThread(s);
             rt.start();
-
-            // OK, I'm done talking - leave the group
-            // s.leaveGroup(groupAddr);
             
             while (true) {
                 if (st.running == false) {

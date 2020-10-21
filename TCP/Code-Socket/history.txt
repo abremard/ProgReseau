@@ -2,3 +2,9 @@ opo : lolo
 plolo : hi
 lili : pojdsfa
 me : asdfe
+lolo : poed
+popo : ezf
+lolo : zef
+lolo : piezf
+lolo : ezf
+popo : meq

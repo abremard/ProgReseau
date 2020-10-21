@@ -17,9 +17,10 @@ public class EchoServerMultiThreaded  {
 	public static List<Socket> socketRegistry = new ArrayList<Socket>();
 	public static List<String> chatHistory = new ArrayList<String>();
  	/**
-  	* main method
-	* @param EchoServer port
-  	* 
+	* main method that creates the server and manages incoming connection requests.
+	* Creates a client thread (server side) at each connection.
+	* @param EchoServer server's port
+	* @exception exception Unexpected error in EchoServerMultiThreaded
   	**/
        public static void main(String args[]){ 
         ServerSocket listenSocket;

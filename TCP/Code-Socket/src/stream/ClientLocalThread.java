@@ -22,8 +22,10 @@ public class ClientLocalThread
 	}
 
  	/**
-  	* receives a request from client then sends an echo to the client
-  	* @param clientSocket the client socket  
+  	* receives all output from the server and prints it to the console
+    * @param clientSocket the client socket  
+    * @exception SocketException  Client Ended
+    * @exception Exception Unexpected error in ClientLocalThread
   	**/
 	public void run() {
     	  try { 

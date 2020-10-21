@@ -16,7 +16,11 @@ public class EchoClient {
  
   /**
   *  main method
-  *  accepts a connection, receives a message from client then sends an echo to the client
+  *  accepts a connection, is the listening thread and creates/manages the send thread (client side)
+  * @param args[0] connection host
+  * @param args[1] socket port
+  * @exception UnknownHostException If host is unknown
+  * @exception Exception Unexpected error in EchoClient
   **/
     public static void main(String[] args) throws IOException {
 
@@ -48,26 +52,25 @@ public class EchoClient {
         }
                              
         String sentLine;
-        String typedLine;;
+        String typedLine;
+
+        //initializes client's username
         System.out.println("Please enter your username");
         pseudo=stdIn.readLine();
+
+        //Creates the Client Receive thread
         ClientLocalThread clientLocalThread = new ClientLocalThread(socIn);
         clientLocalThread.start();
-        //System.out.println("Chat History : ");
-        //for (int i = 0; i < EchoServerMultiThreaded.chatHistory.size(); i++){
-          //System.out.println(EchoServerMultiThreaded.chatHistory.get(i));
-        //}
-        //System.out.println(EchoServerMultiThreaded.chatHistory.size());
+
+        //Waits for client input then sends it to the server
         while (true) {
           typedLine = stdIn.readLine();
         	sentLine=pseudo + " : " + typedLine;
         	if (typedLine != null && typedLine.equals(".")) {
-            //System.out.println(EchoServerMultiThreaded.chatHistory.size());
             clientLocalThread.running = false;
             break;
           }
             socOut.println(sentLine);
-            //EchoServerMultiThreaded.chatHistory.add(sentLine);
         }
       socOut.close();
       socIn.close();

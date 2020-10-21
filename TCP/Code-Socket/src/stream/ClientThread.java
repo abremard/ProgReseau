@@ -24,6 +24,12 @@ public class ClientThread extends Thread {
 		this.clientSocket = s;
 	}
 
+	/**
+	 * Function that writes new messages to the chat history file. Creates
+	 * the file if it doesn't exist.
+	 * @param str
+	 * @exception exception Unexpected error writing into the Chat History file
+	 */	
 	public synchronized void writeToFile(String str) {
 		File chatHistory = new File("history.txt");
 		try {
@@ -38,7 +44,12 @@ public class ClientThread extends Thread {
 			System.err.println("Error writing into the Chat History file");
 		}
 	}
-
+	
+	/**
+	 * Function that reads all the messages in the chat history file.
+	 * @exception FileNotFoundException If the chart history files doesn't
+	 * exist (no messages saved yet), ignore and keep running.
+	 */
 	public synchronized void readChat() {
 		try {
 			File chat = new File("history.txt");
@@ -55,9 +66,12 @@ public class ClientThread extends Thread {
 	}
 
 	/**
-	 * receives a request from client then sends an echo to the client
-	 * 
+	 * Client thread that receives the output of the client socket
+	 * and sends it to all the other registered sockets on the server.
+	 * It deletes the client socket from the server's socket list whren deconnected. 
 	 * @param clientSocket the client socket
+	 * @exception FileNotFoundException Chat history file not found, keep running.
+	 * @exception Exception Unexpected error in ClientThread
 	 **/
 	public void run() {
 		try {
@@ -74,6 +88,7 @@ public class ClientThread extends Thread {
 			socIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			while (true) {
 				String line = socIn.readLine();
+				//Removes the socket from the server's socket list on deconnection
 				if (line != null && line.equals(".")) {
 					for (int i = 0; i < EchoServerMultiThreaded.socketRegistry.size(); i++) {
 						if (EchoServerMultiThreaded.socketRegistry.get(i) == clientSocket) {
@@ -82,7 +97,8 @@ public class ClientThread extends Thread {
 					}
 				} else {
 					if (line != null) {
-						// EchoServerMultiThreaded.chatHistory.add(line);
+						//Adds typed line to the chat history file
+						//EchoServerMultiThreaded.chatHistory.add(line);
 						writeToFile(line);
 						for (int i = 0; i < EchoServerMultiThreaded.socketRegistry.size(); i++) {
 							PrintStream socOut = new PrintStream(

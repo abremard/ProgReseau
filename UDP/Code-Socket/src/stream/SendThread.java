@@ -20,8 +20,12 @@ public class SendThread extends Thread {
 	}
 
  	/**
-  	* receives a request from client then sends an echo to the client
-  	* @param clientSocket the client socket  
+    * The send thread to send the user's typed messages to the group. 
+    * A user first types his username. They can leave by typing " . " 
+    * @param s the group's socket
+    * @param grAddr the group's address
+    * @param grPort the group's port
+    * @exception exception represents an unexpected error in the SendThread
   	**/
 	public void run() {
     	  try { 

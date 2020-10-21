@@ -17,8 +17,9 @@ public class ReceiveThread extends Thread {
 	}
 
  	/**
-  	* receives a request from client then sends an echo to the client
-  	* @param clientSocket the client socket  
+  	* The receive thread to listen and receive all the users messages on the group.  
+    * @param s the group's socket
+    * @exception exception represents an unexpected error in the ReceiveThread 
   	**/
 	public void run() {
     	  try { 

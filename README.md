@@ -10,7 +10,8 @@
 		* 4.2.2. [For UDP chat system](#ForUDPchatsystem)
 		* 4.2.3. [For HTTP server](#ForHTTPserver)
 * 5. [Important notes](#Importantnotes)
-* 6. [Authors](#Authors)
+* 6. [Documentation](#Documentation)
+* 7. [Authors](#Authors)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -51,6 +52,9 @@ Please refer to `/Objectives` directory
 - server files are stored at `TP-HTTP-Code/files` so in the GET, POST, PUT... requests the URL would look like `http://localhost:8080/files/waves.mp4`
 - client_files is just a utility folder for testing purposes. Add a client file inside it and try sending your file to the server using Postman's PUT request, your file will appear in `TP-HTTP-Code/files`
 
-##  6. <a name='Authors'></a>Authors
+##  6. <a name='Documentation'></a>Documentation
+Javadocs are found inside each directory, under `/doc` subdirectory
+
+##  7. <a name='Authors'></a>Authors
 - TOUT Iyad
 - BREMARD Alexandre
